@@ -8,19 +8,22 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         :root {
-            --primary-color: #FF5722;
-            --primary-light: #FF8A65;
-            --secondary-color: #212121;
-            --bg-color: #f8f9fa;
+            --primary-color: #6366f1;
+            --primary-light: #818cf8;
+            --primary-dark: #4f46e5;
+            --secondary-color: #0f172a;
+            --bg-color: #f8fafc;
             --white: #ffffff;
-            --gray-100: #f1f3f5;
-            --gray-200: #e9ecef;
-            --gray-600: #6c757d;
-            --shadow: 0 10px 30px rgba(0,0,0,0.08);
-            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            --glass: rgba(255, 255, 255, 0.8);
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-600: #64748b;
+            --accent-color: #10b981;
+            --shadow: 0 10px 40px rgba(99, 102, 241, 0.1);
+            --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            --glass: rgba(255, 255, 255, 0.9);
         }
 
         body.dark-mode {
@@ -1706,8 +1709,82 @@
                 <div class="order-success">
                     <i class="fa-solid fa-circle-check"></i>
                     <h2>Đặt Hàng Thành Công!</h2>
-                    <p>Cảm ơn bạn đã tin tưởng KoiStore. Mã đơn hàng của bạn là: <strong>#KOI${Math.floor(Math.random() * 900000) + 100000}</strong>. Chúng tôi sẽ phản hồi sớm nhất!</p>
+                    <p>Cảm ơn bạn đã tin tưởng KoiStore. Đơn hàng của bạn đang được xử lý. Chúng tôi sẽ phản hồi sớm nhất!</p>
                     <button class="send-btn" onclick="closeCheckout(true)" style="width: 100%;">Quay lại mua sắm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Auth Modal -->
+    <div class="auth-modal" id="auth-modal">
+        <div class="auth-content">
+            <i class="fa-solid fa-xmark close-checkout" id="close-auth" style="position: absolute; right: 25px; top: 25px; cursor: pointer; color: var(--gray-600);"></i>
+            
+            <div class="auth-tabs" id="auth-tabs-container">
+                <div class="auth-tab active" data-tab="login">Đăng Nhập</div>
+                <div class="auth-tab" data-tab="register">Đăng Ký</div>
+                <div class="auth-tab-indicator"></div>
+            </div>
+
+            <!-- Login Form -->
+            <form id="login-form" class="auth-form active">
+                <h3>Chào mừng trở lại!</h3>
+                <p>Đăng nhập để quản lý đơn hàng và nhận ưu đãi.</p>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="login-email" placeholder="email@example.com" required>
+                </div>
+                <div class="form-group">
+                    <label>Mật khẩu</label>
+                    <input type="password" id="login-password" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn-primary" style="margin-top: 10px;">Đăng Nhập</button>
+                <div class="auth-footer">
+                    Chưa có tài khoản? <a href="javascript:void(0)" onclick="switchTab('register')">Đăng ký ngay</a>
+                </div>
+            </form>
+
+            <!-- Register Form -->
+            <form id="register-form" class="auth-form">
+                <h3>Tạo tài khoản mới</h3>
+                <p>Tham gia cùng cộng đồng KoiStore ngay hôm nay.</p>
+                <div class="form-group">
+                    <label>Họ và tên</label>
+                    <input type="text" id="reg-name" placeholder="Nguyễn Văn A" required>
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="reg-email" placeholder="email@example.com" required>
+                </div>
+                <div class="form-group">
+                    <label>Mật khẩu</label>
+                    <input type="password" id="reg-password" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn-primary" style="margin-top: 10px;">Đăng Ký</button>
+                <div class="auth-footer">
+                    Đã có tài khoản? <a href="javascript:void(0)" onclick="switchTab('login')">Đăng nhập</a>
+                </div>
+            </form>
+
+            <!-- User Profile View -->
+            <div id="user-profile" class="auth-form">
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <img src="https://ui-avatars.com/api/?name=User&background=FF5722&color=fff" id="profile-avatar" style="width: 80px; height: 80px; border-radius: 50%; margin-bottom: 15px;">
+                    <h3 id="profile-name">Xin chào!</h3>
+                    <p id="profile-email">user@example.com</p>
+                </div>
+                
+                <!-- Admin Access Link -->
+                <div id="admin-link-container" style="display: none;">
+                    <a href="javascript:void(0)" onclick="openAdminDashboard()">
+                        <i class="fa-solid fa-gauge-high"></i> Quản trị hệ thống
+                    </a>
+                </div>
+
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button class="btn-primary" style="flex: 1; background: var(--gray-100); color: var(--secondary-color);" onclick="closeAuth.click()">Đóng</button>
+                    <button class="btn-primary" id="logout-btn" style="flex: 1; background: #ff5252;">Đăng xuất</button>
                 </div>
             </div>
         </div>
@@ -1849,17 +1926,36 @@
         <span id="toast-msg">Đã thêm vào giỏ hàng!</span>
     </div>
 
+    <!-- Toast Notification (Top) -->
+    <div class="notification" id="notification">
+        <i class="fa-solid fa-circle-check"></i>
+        <span id="notification-msg">Thông báo</span>
+    </div>
+
     <script>
-            {
-                id: 8,
-                name: "iPad Pro M2 11 inch (Wifi + 5G)",
-                price: 23990000,
-                oldPrice: 25990000,
-                image: "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-                category: "Máy tính bảng",
-                badge: "Đồ họa"
-            }
+        // --- Product & Order Data ---
+        const defaultProducts = [
+            { id: 1, name: "iPhone 15 Pro Max 256GB - Titan Tự Nhiên", price: 32990000, oldPrice: 34990000, image: "https://images.unsplash.com/photo-1695048133142-1a20484d2569?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80", category: "Điện thoại", badge: "Bán chạy" },
+            { id: 2, name: "Tai nghe Sony WH-1000XM5 - Wireless Noise Cancelling", price: 7490000, oldPrice: 8990000, image: "https://images.unsplash.com/photo-1618366712010-f4ae9c647dcb?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80", category: "Âm thanh", badge: "Giảm giá" },
+            { id: 3, name: "MacBook Air M3 13 inch (8GB/256GB) - Space Gray", price: 27990000, oldPrice: 29990000, image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80", category: "Laptop", badge: "Mới" },
+            { id: 4, name: "Apple Watch Ultra 2 - Dây Alpine Xanh", price: 21490000, oldPrice: 22990000, image: "https://images.unsplash.com/photo-1434493789847-2f02dc6ca35d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80", category: "Đồng hồ", badge: "Premium" },
+            { id: 5, name: "iPhone 15 Pro 128GB - Titan Xanh", price: 28490000, oldPrice: 29990000, image: "https://images.unsplash.com/photo-1695048133142-1a20484d2569?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80", category: "Điện thoại", badge: "HOT" },
+            { id: 6, name: "Sony WH-CH720N - Tai nghe chồng ồn giá rẻ", price: 2990000, oldPrice: 3490000, image: "https://images.unsplash.com/photo-1618366712010-f4ae9c647dcb?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80", category: "Âm thanh", badge: "" },
+            { id: 7, name: "MacBook Pro M3 Pro - 14 inch", price: 49990000, oldPrice: 52990000, image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80", category: "Laptop", badge: "Pro" },
+            { id: 8, name: "iPad Pro M2 11 inch (Wifi + 5G)", price: 23990000, oldPrice: 25990000, image: "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80", category: "Máy tính bảng", badge: "Đồ họa" }
         ];
+
+        let savedProducts = JSON.parse(localStorage.getItem('products'));
+        let allProducts = (savedProducts && savedProducts.length > 0) ? savedProducts : defaultProducts;
+        let orders = JSON.parse(localStorage.getItem('orders')) || [];
+        const adminEmail = 'admin@koistore.com';
+
+        // Initialize admin account if not exists
+        const users = JSON.parse(localStorage.getItem('users')) || [];
+        if (!users.find(u => u.email === adminEmail)) {
+            users.push({ name: 'Quản trị viên', email: adminEmail, password: 'admin123', isAdmin: true });
+            localStorage.setItem('users', JSON.stringify(users));
+        }
 
         let cart = JSON.parse(localStorage.getItem('cart')) || [];
         let currentCategory = 'all';
@@ -1894,9 +1990,10 @@
         }
 
         function renderProducts() {
+            if (!productList) return;
             const filteredProducts = currentCategory === 'all' 
-                ? products 
-                : products.filter(p => p.category === currentCategory);
+                ? allProducts 
+                : allProducts.filter(p => p.category === currentCategory);
 
             if (filteredProducts.length === 0) {
                 productList.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 50px; color: var(--gray-600);">Không có sản phẩm nào trong danh mục này.</div>';
@@ -1930,18 +2027,22 @@
             renderProducts();
             
             // Scroll to products section
-            document.getElementById('products').scrollIntoView({ behavior: 'smooth' });
+            const productsSection = document.getElementById('products');
+            if (productsSection) productsSection.scrollIntoView({ behavior: 'smooth' });
             
-            // Highlight active category (optional but premium)
+            // Highlight active category
             const cards = document.querySelectorAll('.category-card');
             cards.forEach(card => {
-                const titleText = card.querySelector('h4').innerText;
-                if (titleText === category || (category === 'all' && titleText === 'Tất cả')) {
-                    card.style.borderColor = 'var(--primary-color)';
-                    card.style.background = 'rgba(255, 87, 34, 0.05)';
-                } else {
-                    card.style.borderColor = 'var(--gray-100)';
-                    card.style.background = 'var(--white)';
+                const title = card.querySelector('h4');
+                if (title) {
+                    const titleText = title.innerText;
+                    if (titleText === category || (category === 'all' && titleText === 'Tất cả')) {
+                        card.style.borderColor = 'var(--primary-color)';
+                        card.style.background = 'rgba(255, 87, 34, 0.05)';
+                    } else {
+                        card.style.borderColor = 'var(--gray-100)';
+                        card.style.background = 'var(--white)';
+                    }
                 }
             });
         }
@@ -1978,26 +2079,32 @@
             const adminLink = document.getElementById('admin-link-container');
 
             if (currentUser) {
-                userInfo.style.display = 'flex';
-                userIcon.style.display = 'none';
-                userName.innerText = currentUser.name.split(' ')[0];
-                userAvatar.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.name)}&background=FF5722&color=fff`;
+                if (userInfo) userInfo.style.display = 'flex';
+                if (userIcon) userIcon.style.display = 'none';
+                if (userName) userName.innerText = currentUser.name.split(' ')[0];
+                if (userAvatar) userAvatar.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.name)}&background=FF5722&color=fff`;
                 
                 // Show admin link if user is admin
-                adminLink.style.display = (currentUser.email === adminEmail || currentUser.isAdmin) ? 'block' : 'none';
+                if (adminLink) {
+                    adminLink.style.display = (currentUser.email === adminEmail || currentUser.isAdmin) ? 'block' : 'none';
+                }
 
                 // Update profile view in modal
-                document.getElementById('profile-email').innerText = currentUser.email;
-                document.getElementById('user-profile').classList.add('active');
-                loginForm.classList.remove('active');
-                registerForm.classList.remove('active');
+                const profileEmail = document.getElementById('profile-email');
+                const userProfileForm = document.getElementById('user-profile');
+                if (profileEmail) profileEmail.innerText = currentUser.email;
+                if (userProfileForm) userProfileForm.classList.add('active');
+                if (loginForm) loginForm.classList.remove('active');
+                if (registerForm) registerForm.classList.remove('active');
             } else {
-                userInfo.style.display = 'none';
-                userIcon.style.display = 'block';
-                adminLink.style.display = 'none';
-                document.getElementById('user-profile').classList.remove('active');
-                loginForm.classList.add('active');
-                registerForm.classList.remove('active');
+                if (userInfo) userInfo.style.display = 'none';
+                if (userIcon) userIcon.style.display = 'block';
+                if (adminLink) adminLink.style.display = 'none';
+                
+                const userProfileForm = document.getElementById('user-profile');
+                if (userProfileForm) userProfileForm.classList.remove('active');
+                if (loginForm) loginForm.classList.add('active');
+                if (registerForm) registerForm.classList.remove('active');
             }
         }
 
@@ -2123,7 +2230,8 @@
         }
 
         function renderAdminProducts() {
-            adminProductList.innerHTML = products.map(p => `
+            if (!adminProductList) return;
+            adminProductList.innerHTML = allProducts.map(p => `
                 <tr>
                     <td>
                         <div class="admin-product-item">
@@ -2172,9 +2280,10 @@
         }
 
         window.openProductForm = function(id = null) {
+            if (!productForm) return;
             productForm.reset();
             if (id) {
-                const p = products.find(prod => prod.id === id);
+                const p = allProducts.find(prod => prod.id === id);
                 document.getElementById('edit-product-id').value = p.id;
                 document.getElementById('p-name').value = p.name;
                 document.getElementById('p-price').value = p.price;
@@ -2193,43 +2302,46 @@
             productFormModal.classList.remove('active');
         }
 
-        productForm.addEventListener('submit', (e) => {
-            e.preventDefault();
+        window.saveProduct = function(e) {
+            if (e) e.preventDefault();
             const id = document.getElementById('edit-product-id').value;
-            const newProduct = {
-                id: id ? parseInt(id) : Date.now(),
-                name: document.getElementById('p-name').value,
-                price: parseInt(document.getElementById('p-price').value),
-                oldPrice: parseInt(document.getElementById('p-oldprice').value) || 0,
-                category: document.getElementById('p-category').value,
-                image: document.getElementById('p-image').value,
-                badge: id ? (products.find(p => p.id === parseInt(id)).badge) : 'Mới'
-            };
+            const name = document.getElementById('p-name').value;
+            const price = parseFloat(document.getElementById('p-price').value);
+            const oldPrice = parseFloat(document.getElementById('p-oldprice').value) || 0;
+            const category = document.getElementById('p-category').value;
+            const image = document.getElementById('p-image').value;
 
             if (id) {
-                const index = products.findIndex(p => p.id === parseInt(id));
-                products[index] = newProduct;
-                showNotification('Đã cập nhật sản phẩm!');
+                const index = allProducts.findIndex(p => p.id == id);
+                if (index !== -1) {
+                    allProducts[index] = { ...allProducts[index], name, price, oldPrice, category, image };
+                    showNotification('Đã cập nhật sản phẩm!');
+                }
             } else {
-                products.push(newProduct);
+                const newProduct = {
+                    id: Date.now(),
+                    name, price, oldPrice, category, image,
+                    badge: 'Mới'
+                };
+                allProducts.push(newProduct);
                 showNotification('Đã thêm sản phẩm mới!');
             }
 
-            localStorage.setItem('products', JSON.stringify(products));
+            localStorage.setItem('products', JSON.stringify(allProducts));
             renderProducts();
             renderAdminProducts();
             closeProductForm();
-        });
+        };
 
         window.deleteProduct = function(id) {
-            if (confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')) {
-                products = products.filter(p => p.id !== id);
-                localStorage.setItem('products', JSON.stringify(products));
+            if (confirm('Bạn có chắc muốn xóa sản phẩm này?')) {
+                allProducts = allProducts.filter(p => p.id !== id);
+                localStorage.setItem('products', JSON.stringify(allProducts));
                 renderProducts();
                 renderAdminProducts();
                 showNotification('Đã xóa sản phẩm.');
             }
-        }
+        };
 
         function renderCart() {
             if (cart.length === 0) {
@@ -2267,7 +2379,7 @@
         }
 
         window.addToCart = function(productId) {
-            const product = products.find(p => p.id === productId);
+            const product = allProducts.find(p => p.id === productId);
             const existingItem = cart.find(item => item.id === productId);
 
             if (existingItem) {
@@ -2430,9 +2542,11 @@
         }
 
         // --- Initialize ---
-        renderProducts();
-        renderCart();
-        updateUIForUser();
+        document.addEventListener('DOMContentLoaded', () => {
+            renderProducts();
+            renderCart();
+            updateUIForUser();
+        });
 
     </script>
 </body>
